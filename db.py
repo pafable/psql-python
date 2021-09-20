@@ -1,6 +1,10 @@
 import psycopg2
 from configparser import ConfigParser
 
+'''
+python code to interact with postgresql database.
+'''
+
 # get db configs
 def config(filename="config.ini", section="postgresql"):
     parser = ConfigParser()
@@ -16,14 +20,31 @@ def config(filename="config.ini", section="postgresql"):
 
     return db
 
-def connect():
-    connection = None
+
+def create_table(table_name: str) -> None:
+    sql = f'CREATE TABLE IF NOT EXISTS public.{table_name} ' \
+          f'(id integer NOT NULL, ' \
+          f'name character varying COLLATE pg_catalog."default" NOT NULL, ' \
+          f'ismod boolean); ' \
+          f'ALTER TABLE public.{table_name} ' \
+          f'OWNER to postgres;'
+
     params = config()
     print('Connecting to postgresql database...')
     con = psycopg2.connect(**params)
 
     # create a cursor
-    # crsr = con.cursor()
+    cur = con.cursor()
 
+    # Create a table
+    print(f'Creating {table_name} table in db')
+    cur.execute(sql)
+    x = con.commit()
 
-print(connect())
+    # Close connection
+    cur.close()
+    con.close()
+
+    return x
+
+create_table('hello_kitty')
