@@ -47,4 +47,26 @@ def create_table(table_name: str) -> None:
 
     return x
 
-create_table('hello_kitty')
+create_table('foobar')
+
+def fetch_user_data() -> str:
+    sql = '''SELECT * FROM users'''
+
+    params = config()
+    print('Connecting to postgresql database...')
+    con = psycopg2.connect(**params)
+
+    # create a cursor
+    cur = con.cursor()
+    cur.execute(sql)
+    x = cur.fetchall()
+
+    # Close connection
+    cur.close()
+    con.close()
+
+    return x
+
+for data in fetch_user_data():
+    id, name, email, iscontractor, iscool = data
+    print(f'[{id}]: {name} {email}, contractor: {iscontractor}, is cool? {iscool}')
